@@ -1,0 +1,3 @@
+"scripts":{
+    "BUILD": "babel src --out -dir lib"
+}
