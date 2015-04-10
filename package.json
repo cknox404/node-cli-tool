@@ -1,3 +1,30 @@
-"scripts":{
-    "BUILD": "babel src --out -dir lib"
+{
+  "name": "node-cli-tool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "node-cli-tool": "release.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cknox404/node-cli-tool.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cknox404/node-cli-tool/issues"
+  },
+  "homepage": "https://github.com/cknox404/node-cli-tool",
+  "scripts":{
+    "build": "babel src --out-dir lib"
+  }
 }
