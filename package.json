@@ -10,9 +10,13 @@
     "test": "test"
   },
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "babel": "^5.0.12",
+    "mocha": "*"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "babel src --out-dir lib",
+    "test": "mocha --compilers js:babel/register"
   },
   "repository": {
     "type": "git",
@@ -23,8 +27,5 @@
   "bugs": {
     "url": "https://github.com/cknox404/node-cli-tool/issues"
   },
-  "homepage": "https://github.com/cknox404/node-cli-tool",
-  "scripts":{
-    "build": "babel src --out-dir lib"
-  }
+  "homepage": "https://github.com/cknox404/node-cli-tool"
 }

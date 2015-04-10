@@ -1,0 +1,3 @@
+function Bump(current, type){
+     
+}
