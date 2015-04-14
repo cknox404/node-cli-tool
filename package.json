@@ -1,10 +1,10 @@
 {
   "name": "node-cli-tool",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "bin": {
-    "node-cli-tool": "release.js"
+    "node-cli-tool": "release"
   },
   "directories": {
     "test": "test"
@@ -12,7 +12,10 @@
   "dependencies": {},
   "devDependencies": {
     "babel": "^5.0.12",
-    "mocha": "*"
+    "fs-promise": "^0.3.1",
+    "mocha": "^2.2.4",
+    "semver": "^4.3.3",
+    "yargs": "^3.7.1"
   },
   "scripts": {
     "build": "babel src --out-dir lib",

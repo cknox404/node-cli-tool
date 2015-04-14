@@ -1,9 +1,72 @@
-import * as cli from "../src/cli";
-var c = cli.new;
+//import {getHello} from "../src/cli.js";
+//
+//
+//describe("Hello", function(){
+//    it("Hello curtis should be printed", function(){
+//        assert(getHello("curtis")==="Hello curtis");
+//    })
+//})
+
 var assert = require("assert");
 
-describe("Hello", function(){
-    it("Hello curtis should be printed", function(){
-        assert(c.getHello("curtis")=="Hello curtis");
+import {bump} from "../src/version-bump.js";
+
+describe("Validation", function(){
+    it("Exception is thrown when invalid version is given", function(){
+        assert.throws(function(){bump("a.b.c")}, Error, "No error thrown")
+    })
+    
+    it("Exception is thrown when invalid version is given", function(){
+        assert.throws(function(){bump("0.0.0", "abc")}, Error, "No error thrown")
+    })
+})
+
+describe("Bump", function(){
+    it("Major bump increments major slot by one", function(){
+        assert(bump("0.0.0", "major")=="1.0.0")
+    })
+    
+    it("Minor bump increments minor slot by one", function(){
+        assert(bump("0.0.0", "minor")=="0.1.0")
+    })
+    
+    it("Patch bump increments patch slot by one", function(){
+        assert(bump("0.0.0", "patch")=="0.0.1")
+    })
+    describe("Pre", function(){
+    
+        it("PreMajor bump increments the major slot by one and appends the prerelease number", function(){
+            assert(bump("0.0.0", "premajor")=="1.0.0-0")
+        })
+        
+        it("PreMajor bump appends pre type if one is given", function(){
+            assert(bump("0.0.0", "premajor", "beta")=="1.0.0-beta.0")
+        })
+        
+        it("PreMinor bump increments the minor slot by one and appends the prerelease number", function(){
+            assert(bump("0.0.0", "preminor")=="0.1.0-0")
+        })
+        
+        it("PreMinor bump appends pre type if one is given", function(){
+            assert(bump("0.0.0", "preminor", "beta")=="0.1.0-beta.0")
+        })
+        
+        it("PrePatch bump increments the patch slot by one and appends the prerelease number", function(){
+            assert(bump("0.0.0", "prepatch")=="0.0.1-0")
+        })
+        
+        it("PrePatch bump appends pre type if one is given", function(){
+            assert(bump("0.0.0", "prepatch", "beta")=="0.0.1-beta.0")
+        })
+        
+        it("Prerelease names go in alphabetical order", function(){
+            let version = bump("0.0.0", "prerelease", "alpha");
+            assert(bump(version, "prerelease", "beta")=="0.0.1-beta.0")
+        })
+        
+        it("Exception is thrown when attempting prerelease a version lower alphabetically", function(){
+            let version = bump("0.0.0", "prerelease", "beta");
+            assert.throws(function(){bump(version, "prerelease", "alpha")}, Error, "No error thrown")
+        })
     })
 })
