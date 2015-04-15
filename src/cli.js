@@ -1,27 +1,10 @@
-//console.log('Hello World');
-//console.log(getHello(process.argv[2]));
-//function getHello(name){
-//    return ('Hello '+name);
-//}
-//export {getHello};
-
-//random tests
-//import semver from "semver";
 import {bump} from "./version-bump.js";
-//var q = bump("0.0.0", "prerelease")
-//console.log(q);
-//var w = bump(q, "prerelease", "delta")
-//console.log(w);
-//console.log(semver.gt(w, q));
 
 var argv = require('yargs')
     .usage('Usage: $0 <command> [options]')
     .command('bump', 'Version bump a release')
-    .example('$0 bump -v 0.0.0 -t major', 'do a major bump to the given version')
-    .demand(['v','t'])
-    .alias('v', 'version')
-    .nargs('v', 1)
-    .describe('v', 'Version number')
+    .example('$0 bump -t major', 'do a major bump to the current version')
+    .demand(['t'])
     .alias('t', 'type')
     .nargs('t', 1)
     .describe('t', 'Bump type')
@@ -34,7 +17,8 @@ var argv = require('yargs')
     .argv;
 
 import json from "../package.json";
-json.version = bump(json.version, argv.type, argv.preid);
+var newVersion = bump(json.version, argv.type, argv.preid);
+json.version = newVersion;
 console.log(json.version);
 
 var fsp = require('fs-promise'),
@@ -45,9 +29,46 @@ fsp.writeFile('package.json', JSON.stringify(json, null, 2))
     //return fsp.readFile(file, {encoding:'utf8'});
   })
 
-function file(){
-  var args = [].slice.call(arguments);
-  args.unshift('bin');
-    console.log(path.join.apply(path, args));
-  return path.join.apply(path, args);
-}
+var exec = require('child-process-promise').exec;
+ 
+exec('git add .')
+    .then(function (result) {
+        var stdout = result.stdout;
+        var stderr = result.stderr;
+        console.log('stdout: ', stdout);
+        console.log('stderr: ', stderr);
+        exec('git commit -m "Release v'+newVersion+'"')
+            .then(function (result) {
+                var stdout = result.stdout;
+                var stderr = result.stderr;
+                console.log('stdout: ', stdout);
+                console.log('stderr: ', stderr);
+                exec('git tag "project v'+newVersion+'"')
+                    .then(function (result) {
+                        var stdout = result.stdout;
+                        var stderr = result.stderr;
+                        console.log('stdout: ', stdout);
+                        console.log('stderr: ', stderr);
+                        exec('git push')
+                            .then(function (result) {
+                                var stdout = result.stdout;
+                                var stderr = result.stderr;
+                                console.log('stdout: ', stdout);
+                                console.log('stderr: ', stderr);
+                            })
+                            .fail(function (err) {
+                                console.error('ERROR: ', err);
+                            })
+                    })
+                    .fail(function (err) {
+                        console.error('ERROR: ', err);
+                    })
+            })
+            .fail(function (err) {
+                console.error('ERROR: ', err);
+            })
+    })
+    .fail(function (err) {
+        console.error('ERROR: ', err);
+    })
+
