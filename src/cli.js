@@ -31,7 +31,7 @@ fsp.writeFile('package.json', JSON.stringify(json, null, 2))
 
 var exec = require('child-process-promise').exec;
  
-exec('git add .')
+exec('git add package.json')
     .then(function (result) {
         var stdout = result.stdout;
         var stderr = result.stderr;
@@ -43,7 +43,7 @@ exec('git add .')
                 var stderr = result.stderr;
                 console.log('stdout: ', stdout);
                 console.log('stderr: ', stderr);
-                exec('git tag -a v'+newVersion)
+                exec('git tag Releasev'+newVersion)
                     .then(function (result) {
                         var stdout = result.stdout;
                         var stderr = result.stderr;
@@ -55,6 +55,17 @@ exec('git add .')
                                 var stderr = result.stderr;
                                 console.log('stdout: ', stdout);
                                 console.log('stderr: ', stderr);
+                                exec('echo npm publish')
+                                    .then(function (result) {
+                                        var stdout = result.stdout;
+                                        var stderr = result.stderr;
+                                        console.log('stdout: ', stdout);
+                                        console.log('stderr: ', stderr);
+
+                                    })
+                                    .fail(function (err) {
+                                        console.error('ERROR: ', err);
+                                    })
                             })
                             .fail(function (err) {
                                 console.error('ERROR: ', err);
