@@ -43,7 +43,7 @@ exec('git add .')
                 var stderr = result.stderr;
                 console.log('stdout: ', stdout);
                 console.log('stderr: ', stderr);
-                exec('git tag "-a v'+newVersion+'"')
+                exec('git tag -a v'+newVersion)
                     .then(function (result) {
                         var stdout = result.stdout;
                         var stderr = result.stderr;
