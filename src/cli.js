@@ -49,7 +49,7 @@ exec('git add .')
                         var stderr = result.stderr;
                         console.log('stdout: ', stdout);
                         console.log('stderr: ', stderr);
-                        exec('git push')
+                        exec('git push --tags')
                             .then(function (result) {
                                 var stdout = result.stdout;
                                 var stderr = result.stderr;
