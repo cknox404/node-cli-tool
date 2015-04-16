@@ -1,85 +1,25 @@
 import {bump} from "./version-bump.js";
-
-var argv = require('yargs')
-    .usage('Usage: $0 <command> [options]')
-    .command('bump', 'Version bump a release')
-    .example('$0 bump -t major', 'do a major bump to the current version')
-    .demand(['t'])
-    .alias('t', 'type')
-    .nargs('t', 1)
-    .describe('t', 'Bump type')
-    .alias('p', 'preid')
-    .nargs('p', 1)
-    .describe('p', 'Prerelease id')
-    .help('h')
-    .alias('h', 'help')
-    .epilog('copyright 2015')
-    .argv;
-
 import json from "../package.json";
-var newVersion = bump(json.version, argv.type, argv.preid);
-json.version = newVersion;
-console.log(json.version);
+import fsp from 'fs-promise';
+import path from 'path';
+import {exec} from 'child-process-promise';
+import parseCliArgs from './cli-yargs.js';
 
-var fsp = require('fs-promise'),
-    path = require('path');
+export default function updateJson(args){
+    var argv = parseCliArgs(args);
+    var newVersion = bump(json.version, argv.t, argv.p);
+    json.version = newVersion;
+    
+    return fsp.writeFile('package.json', JSON.stringify(json, null, 2))
+        .then(() => exec('echo git add package.json'))
+        .then(() => exec(`echo git commit -m "Release v${newVersion}"`))
+        .then(() => exec(`echo git tag Releasev${newVersion}`))
+        .then(() => exec('echo git push --tags'))
+        .then(() => exec('echo npm publish'))
+        .catch(err => {
+            console.log(`Failed: ${err}`)
+        });
+}
 
-fsp.writeFile('package.json', JSON.stringify(json, null, 2))
-  .then(function(){
-    //return fsp.readFile(file, {encoding:'utf8'});
-  })
-
-var exec = require('child-process-promise').exec;
- 
-exec('git add package.json')
-    .then(function (result) {
-        var stdout = result.stdout;
-        var stderr = result.stderr;
-        console.log('stdout: ', stdout);
-        console.log('stderr: ', stderr);
-        exec('git commit -m "Release v'+newVersion+'"')
-            .then(function (result) {
-                var stdout = result.stdout;
-                var stderr = result.stderr;
-                console.log('stdout: ', stdout);
-                console.log('stderr: ', stderr);
-                exec('git tag Releasev'+newVersion)
-                    .then(function (result) {
-                        var stdout = result.stdout;
-                        var stderr = result.stderr;
-                        console.log('stdout: ', stdout);
-                        console.log('stderr: ', stderr);
-                        exec('git push --tags')
-                            .then(function (result) {
-                                var stdout = result.stdout;
-                                var stderr = result.stderr;
-                                console.log('stdout: ', stdout);
-                                console.log('stderr: ', stderr);
-                                exec('echo npm publish')
-                                    .then(function (result) {
-                                        var stdout = result.stdout;
-                                        var stderr = result.stderr;
-                                        console.log('stdout: ', stdout);
-                                        console.log('stderr: ', stderr);
-
-                                    })
-                                    .fail(function (err) {
-                                        console.error('ERROR: ', err);
-                                    })
-                            })
-                            .fail(function (err) {
-                                console.error('ERROR: ', err);
-                            })
-                    })
-                    .fail(function (err) {
-                        console.error('ERROR: ', err);
-                    })
-            })
-            .fail(function (err) {
-                console.error('ERROR: ', err);
-            })
-    })
-    .fail(function (err) {
-        console.error('ERROR: ', err);
-    })
-
+if(process.argv.size > 2)
+    updateJson(process.argv);
